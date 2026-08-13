@@ -323,7 +323,14 @@ def stop_task():
         return f'No task found with ID {task_id}.'
 
 
+# Health endpoint for platform healthchecks
+@app.route('/health')
+def health():
+    return 'OK', 200
+
+
 if __name__ == '__main__':
     # For development only. In production Render you should run with gunicorn (Procfile included).
     port = int(os.environ.get('PORT', 5000))
+    app.logger.info(f"Starting development server on 0.0.0.0:{port}")
     app.run(host='0.0.0.0', port=port)
