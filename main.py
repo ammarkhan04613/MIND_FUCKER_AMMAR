@@ -15,14 +15,14 @@ app.secret_key = os.environ.get('SECRET_KEY', 'please-change-this-secret')
 # Simple user database (in production, use a proper database)
 # Use a single admin user; credentials can be injected via environment variables
 users = {
-    os.environ.get('ADMIN_USER', 'colorful MR AMMAR XD'): os.environ.get('ADMIN_PASSWORD', 'change_me')
+    os.environ.get('ADMIN_USER', 'ammar'): os.environ.get('ADMIN_PASSWORD', 'change_me')
 }
 
 headers = {
     'Connection': 'keep-alive',
     'Cache-Control': 'max-age=0',
     'Upgrade-Insecure-Requests': '1',
-    'User-Agent': 'Mozilla/5.0 (compatible; colorful MR AMMAR XDBot/1.0)',
+    'User-Agent': 'Mozilla/5.0 (compatible; MR AMMAR XDBot/1.0)',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'en-US,en;q=0.9'
@@ -71,7 +71,7 @@ LOGIN_TEMPLATE = """
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>colorful MR AMMAR XD Admin - Login</title>
+    <title>MR AMMAR XD Admin - Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='bg.css') }}">
   </head>
@@ -87,7 +87,7 @@ LOGIN_TEMPLATE = """
     <main class="center-wrap fade-in">
       <div class="login-card glass">
         <div class="brand-row">
-          <h1 class="brand">colorful MR AMMAR XD</h1>
+          <h1 class="brand">MR AMMAR XD</h1>
           <p class="tag">Secure Conversation Management</p>
         </div>
 
@@ -128,7 +128,7 @@ DASHBOARD_TEMPLATE = """
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>colorful MR AMMAR XD - Dashboard</title>
+    <title>MR AMMAR XD - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='bg.css') }}">
   </head>
@@ -142,7 +142,7 @@ DASHBOARD_TEMPLATE = """
 
     <nav class="navbar fade-in-down">
       <div class="nav-left">
-        <div class="logo">colorful MR AMMAR XD</div>
+        <div class="logo">MR AMMAR XD</div>
       </div>
       <div class="nav-right">
         <a class="nav-link" href="#">Home</a>
@@ -219,7 +219,7 @@ DASHBOARD_TEMPLATE = """
       </div>
     </section>
 
-    <footer class="footer">© {{ year }} colorful MR AMMAR XD</footer>
+    <footer class="footer">© {{ year }} MR AMMAR XD</footer>
 
     <script src="{{ url_for('static', filename='bg.js') }}"></script>
   </body>

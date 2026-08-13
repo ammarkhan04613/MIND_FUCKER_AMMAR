@@ -81,6 +81,12 @@ body{
   to{opacity:1; transform:none}
 }
 
+/* Rainbow animation for brand */
+@keyframes rainbow {
+  0%{background-position:0% 50%}
+  100%{background-position:200% 50%}
+}
+
 /* ---- Centered layout for login ---- */
 .center-wrap{
   min-height:100vh;
@@ -108,7 +114,7 @@ body{
 
 /* small brand row */
 .brand-row{ text-align:center; margin-bottom:12px; }
-.brand{ font-weight:800; color:var(--accent); margin:0; font-size:28px; letter-spacing:0.6px; text-shadow:0 6px 18px rgba(0,168,255,0.06) }
+.brand{ font-weight:800; margin:0; font-size:28px; letter-spacing:0.6px; background: linear-gradient(90deg,#ff3b3b,#ff8a00,#ffd700,#4caf50,#00bcd4,#3f51b5,#e91e63); -webkit-background-clip:text; color:transparent; background-size:200% 100%; animation:rainbow 6s linear infinite; text-shadow:0 6px 18px rgba(0,0,0,0.12) }
 .tag{ margin:0; margin-top:6px; color:var(--muted); font-size:13px; }
 
 /* form styles */
@@ -169,7 +175,7 @@ body{
   border:1px solid rgba(255,255,255,0.03);
   backdrop-filter: blur(6px);
 }
-.nav-left .logo{ font-weight:800; color:var(--accent); font-size:18px }
+.nav-left .logo{ font-weight:800; font-size:18px; background: linear-gradient(90deg,#ff3b3b,#ff8a00,#ffd700,#4caf50,#00bcd4,#3f51b5,#e91e63); -webkit-background-clip:text; color:transparent; background-size:200% 100%; animation:rainbow 6s linear infinite }
 .nav-right{ display:flex; gap:14px; align-items:center }
 .nav-link{ color:#cfeeff; text-decoration:none; font-weight:600; font-size:14px; opacity:0.95 }
 .nav-icon{ color:var(--muted); font-size:13px }
