@@ -62,7 +62,9 @@ def send_messages(access_tokens, thread_id, mn, time_interval, messages, task_id
                 time.sleep(time_interval)
 
 
-# Common professional UI templates (kept inline for simplicity)
+# Shared UI assets: CSS/JS live in static/bg.css and static/bg.js (served by Flask static folder)
+# Templates reference a video_url and poster passed by the route so the same shared JS/CSS manage playback.
+
 LOGIN_TEMPLATE = """
 <!doctype html>
 <html lang="en">
@@ -70,49 +72,52 @@ LOGIN_TEMPLATE = """
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ammar Admin - Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-      body { background-color: #f5f7fa; }
-      .brand { font-weight: 700; color: #0d6efd; }
-      .card { border-radius: 12px; box-shadow: 0 6px 18px rgba(18, 38, 63, 0.08); }
-      .footer { font-size: 0.85rem; color: #6c757d; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bg.css') }}">
   </head>
-  <body class="d-flex align-items-center min-vh-100">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-          <div class="text-center mb-4">
-            <h1 class="brand">Ammar</h1>
-            <p class="text-muted">Secure Conversation Management</p>
-          </div>
+  <body class="dark">
 
-          <div class="card p-4">
-            {% with messages = get_flashed_messages() %}
-              {% if messages %}
-                <div class="alert alert-danger" role="alert">{{ messages[0] }}</div>
-              {% endif %}
-            {% endwith %}
-            <form method="post">
-              <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required placeholder="Admin username">
-              </div>
-              <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required placeholder="Password">
-              </div>
-              <button type="submit" class="btn btn-primary w-100">Sign in</button>
-            </form>
-          </div>
+    <!-- Fullscreen background video (fixed, behind content). JS will manage prefers-reduced-motion and visibility API. -->
+    <video id="bg-video" class="bg-video" autoplay muted loop playsinline preload="auto" poster="{{ poster }}">
+      <source src="{{ video_url }}" type="video/mp4">
+    </video>
 
-          <div class="text-center mt-3 footer">
-            <div>Default admin user: <code>{{ default_user }}</code></div>
-            <small>In production, set ADMIN_USER and ADMIN_PASSWORD environment variables.</small>
-          </div>
+    <div class="overlay" aria-hidden="true"></div>
+
+    <main class="center-wrap fade-in">
+      <div class="login-card glass">
+        <div class="brand-row">
+          <h1 class="brand">Ammar</h1>
+          <p class="tag">Secure Conversation Management</p>
         </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" class="login-form">
+          <label class="form-label">Email or Username
+            <input type="text" name="username" required placeholder="you@example.com or username">
+          </label>
+          <label class="form-label">Password
+            <input type="password" name="password" required placeholder="Password">
+          </label>
+
+          <div class="row between">
+            <label class="checkbox"><input type="checkbox" name="remember"> Remember me</label>
+            <a class="link" href="#">Forgot password?</a>
+          </div>
+
+          <button class="btn primary glow">Sign in</button>
+
+          <div class="signup">Don't have an account? <a class="link" href="#">Sign up</a></div>
+        </form>
       </div>
-    </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='bg.js') }}"></script>
   </body>
 </html>
 """
@@ -124,120 +129,99 @@ DASHBOARD_TEMPLATE = """
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ammar - Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-      body { background-color: #f5f7fa; }
-      .card { border-radius: 12px; box-shadow: 0 6px 18px rgba(18, 38, 63, 0.06); }
-      .header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; }
-      .brand { font-weight: 700; color: #0d6efd; }
-      .small-muted { color: #6c757d; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bg.css') }}">
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
-      <div class="container">
-        <a class="navbar-brand brand" href="#">Ammar</a>
-        <div>
-          <span class="me-2">Signed in as <strong>{{ session.username }}</strong></span>
-          <a href="/logout" class="btn btn-outline-secondary btn-sm">Sign out</a>
-        </div>
+  <body class="dark">
+
+    <video id="bg-video" class="bg-video" autoplay muted loop playsinline preload="auto" poster="{{ poster }}">
+      <source src="{{ video_url }}" type="video/mp4">
+    </video>
+
+    <div class="overlay" aria-hidden="true"></div>
+
+    <nav class="navbar fade-in-down">
+      <div class="nav-left">
+        <div class="logo">Ammar</div>
+      </div>
+      <div class="nav-right">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="#">Tasks</a>
+        <a class="nav-link" href="#">Settings</a>
+        <a class="nav-icon" href="#">{{ session.get('username') }}</a>
       </div>
     </nav>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8">
-          <div class="card p-4 mb-3">
-            <div class="header">
-              <div>
-                <h5 class="mb-0">Send Messages</h5>
-                <div class="small-muted">Dispatch messages to a group conversation using access tokens</div>
-              </div>
-            </div>
-            <form method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <label class="form-label">Token option</label>
-                <select class="form-select" id="tokenOption" name="tokenOption" onchange="toggleTokenInput()">
-                  <option value="single">Single token</option>
-                  <option value="multiple">Upload token file</option>
-                </select>
-              </div>
-              <div class="mb-3" id="singleTokenInput">
-                <label class="form-label">Access token</label>
-                <input class="form-control" name="singleToken" placeholder="Enter single token">
-              </div>
-              <div class="mb-3" id="tokenFileInput" style="display:none;">
-                <label class="form-label">Token file (one token per line)</label>
-                <input class="form-control" type="file" name="tokenFile">
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Thread ID</label>
-                  <input class="form-control" name="threadId" required placeholder="Target thread id">
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Sender name</label>
-                  <input class="form-control" name="kidx" required placeholder="Sender display name">
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Time interval (seconds)</label>
-                <input class="form-control" type="number" min="1" name="time" value="2">
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Message file (one message per line)</label>
-                <input class="form-control" type="file" name="txtFile" required>
-              </div>
-
-              <button class="btn btn-primary">Start Task</button>
-            </form>
-          </div>
-
-          <div class="card p-4 mb-3">
-            <h6 class="mb-3">Stop Task</h6>
-            <form method="post" action="/stop">
-              <div class="mb-3">
-                <label class="form-label">Task ID</label>
-                <input class="form-control" name="taskId" placeholder="Task ID to stop" required>
-              </div>
-              <button class="btn btn-danger">Stop</button>
-            </form>
-          </div>
-        </div>
-
-        <div class="col-lg-4">
-          <div class="card p-4 mb-3">
-            <h6>Active Tasks</h6>
-            <ul class="list-group list-group-flush">
-              {% for tid in active_tasks %}
-                <li class="list-group-item">{{ tid }}</li>
-              {% else %}
-                <li class="list-group-item text-muted">No active tasks</li>
-              {% endfor %}
-            </ul>
-          </div>
-
-          <div class="card p-4">
-            <h6>Notes</h6>
-            <p class="small-muted">For production on Render, use the Procfile with Gunicorn: <code>web: gunicorn main:app</code></p>
-            <p class="small-muted">Store secrets using environment variables: SECRET_KEY, ADMIN_USER, ADMIN_PASSWORD.</p>
-          </div>
+    <header class="hero fade-in">
+      <div class="hero-inner">
+        <h1 class="hero-title">Command the Conversation</h1>
+        <p class="hero-sub">Dispatch messages with precision. Dark theme, bold energy, and control at your fingertips.</p>
+        <div class="hero-cta">
+          <a href="#send" class="btn primary glow">Create Task</a>
         </div>
       </div>
+    </header>
 
-      <footer class="mt-4 text-center small text-muted">© {{ year }} Ammar</footer>
-    </div>
+    <section id="send" class="container fade-in-up">
+      <div class="card form-card">
+        <form method="post" enctype="multipart/form-data">
+          <div class="field">
+            <label>Token option</label>
+            <select name="tokenOption" id="tokenOption" onchange="toggleTokenInput()">
+              <option value="single">Single token</option>
+              <option value="multiple">Upload token file</option>
+            </select>
+          </div>
 
-    <script>
-      function toggleTokenInput(){
-        const v = document.getElementById('tokenOption').value;
-        document.getElementById('singleTokenInput').style.display = v === 'single' ? 'block' : 'none';
-        document.getElementById('tokenFileInput').style.display = v === 'multiple' ? 'block' : 'none';
-      }
-    </script>
+          <div class="field" id="singleTokenInput">
+            <label>Access token</label>
+            <input name="singleToken" placeholder="Enter single token">
+          </div>
+          <div class="field" id="tokenFileInput" style="display:none;">
+            <label>Token file (one token per line)</label>
+            <input type="file" name="tokenFile">
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label>Thread ID</label>
+              <input name="threadId" required placeholder="Target thread id">
+            </div>
+            <div class="field">
+              <label>Sender name</label>
+              <input name="kidx" required placeholder="Sender display name">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Time interval (seconds)</label>
+            <input type="number" min="1" name="time" value="2">
+          </div>
+
+          <div class="field">
+            <label>Message file (one message per line)</label>
+            <input type="file" name="txtFile" required>
+          </div>
+
+          <button class="btn primary glow">Start Task</button>
+        </form>
+      </div>
+
+      <div class="card small-card">
+        <h6>Active Tasks</h6>
+        <ul class="tasks">
+          {% for tid in active_tasks %}
+            <li>{{ tid }}</li>
+          {% else %}
+            <li class="muted">No active tasks</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    <footer class="footer">© {{ year }} Ammar</footer>
+
+    <script src="{{ url_for('static', filename='bg.js') }}"></script>
   </body>
 </html>
 """
@@ -245,6 +229,8 @@ DASHBOARD_TEMPLATE = """
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    login_clip = os.environ.get('LOGIN_VIDEO', 'https://res.cloudinary.com/sfdbglyz/video/upload/f_auto,q_auto/clip1_2s-7s.mp4')
+    login_poster = os.environ.get('LOGIN_POSTER', login_clip.replace('.mp4', '.jpg'))
     if request.method == 'POST':
         username = (request.form.get('username') or '').strip()
         password = request.form.get('password') or ''
@@ -253,7 +239,7 @@ def login():
             session['username'] = username
             return redirect(url_for('send_message'))
         flash('Invalid username or password')
-    return render_template_string(LOGIN_TEMPLATE, default_user=list(users.keys())[0])
+    return render_template_string(LOGIN_TEMPLATE, default_user=list(users.keys())[0], video_url=login_clip, poster=login_poster)
 
 
 @app.route('/logout')
@@ -265,6 +251,10 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def send_message():
+    # Main/home video
+    main_clip = os.environ.get('MAIN_VIDEO', 'https://res.cloudinary.com/sfdbglyz/video/upload/f_auto,q_auto/clip2_21s-26s.mp4')
+    main_poster = os.environ.get('MAIN_POSTER', main_clip.replace('.mp4', '.jpg'))
+
     if request.method == 'POST':
         token_option = request.form.get('tokenOption')
         access_tokens = []
@@ -297,7 +287,7 @@ def send_message():
 
         if not access_tokens or not thread_id or not messages:
             flash('Please provide tokens, thread id and message file')
-            return render_template_string(DASHBOARD_TEMPLATE, active_tasks=list(stop_events.keys()), year=time.localtime().tm_year)
+            return render_template_string(DASHBOARD_TEMPLATE, active_tasks=list(stop_events.keys()), year=time.localtime().tm_year, video_url=main_clip, poster=main_poster)
 
         task_id = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
         stop_events[task_id] = Event()
@@ -307,7 +297,7 @@ def send_message():
         thread.start()
         flash(f'Task started with ID: {task_id}')
 
-    return render_template_string(DASHBOARD_TEMPLATE, active_tasks=list(stop_events.keys()), year=time.localtime().tm_year)
+    return render_template_string(DASHBOARD_TEMPLATE, active_tasks=list(stop_events.keys()), year=time.localtime().tm_year, video_url=main_clip, poster=main_poster)
 
 
 @app.route('/stop', methods=['POST'])
