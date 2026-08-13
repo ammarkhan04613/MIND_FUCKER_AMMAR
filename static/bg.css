@@ -1,0 +1,221 @@
+/* static/bg.css
+   Shared visual system for login + main pages:
+   - Fullscreen video background (fixed, behind content)
+   - Dark anime/action aesthetic with electric accent glow
+   - Glassmorphism login card + transparent nav + responsive layout
+   - Accessible reduced-motion fallback via media query and JS
+*/
+
+/* ---- Variables / accents ---- */
+:root{
+  --bg-overlay: rgba(0,0,0,0.55);
+  --accent: #00a8ff;      /* electric blue */
+  --accent-2: #ffb400;    /* gold/orange */
+  --muted: #9aa4b2;
+  --glass-border: rgba(255,255,255,0.06);
+  --glass-glow: 0 6px 28px rgba(0,168,255,0.08);
+  --radius: 14px;
+  --max-width: 1100px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* ---- Base resets ---- */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  color:#e6eef8;
+  background:#05060a;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+
+/* ---- Background video element ---- */
+.bg-video{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  object-fit:cover;          /* smart crop, preserves aspect */
+  object-position:center;
+  z-index:-1;                /* behind everything */
+  pointer-events:none;
+  transform:translateZ(0);   /* GPU hint */
+  will-change:transform;
+  background-size:cover;
+}
+
+/* overlay between video and content for contrast/readability */
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.6) 60%), var(--bg-overlay);
+  pointer-events:none;
+}
+
+/* ---- Motion & accessibility ---- */
+/* Reduce motion preference: hide the video and rely on poster/backdrop set in JS */
+@media (prefers-reduced-motion: reduce){
+  .bg-video{ display:none !important; }
+  .overlay{ background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.65)); }
+}
+
+/* ---- Animations (subtle) ---- */
+.fade-in{animation:fadeIn .8s cubic-bezier(.2,.9,.2,1) both}
+.fade-in-up{animation:fadeInUp .9s cubic-bezier(.2,.9,.2,1) both}
+.fade-in-down{animation:fadeInDown .9s cubic-bezier(.2,.9,.2,1) both}
+
+@keyframes fadeIn {
+  from{opacity:0; transform: translateY(6px)}
+  to{opacity:1; transform:none}
+}
+@keyframes fadeInUp {
+  from{opacity:0; transform: translateY(18px)}
+  to{opacity:1; transform:none}
+}
+@keyframes fadeInDown {
+  from{opacity:0; transform: translateY(-8px)}
+  to{opacity:1; transform:none}
+}
+
+/* ---- Centered layout for login ---- */
+.center-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1;
+  position:relative;
+  padding:24px;
+}
+
+/* glass / frosted card */
+.login-card{
+  width:100%;
+  max-width:420px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid var(--glass-border);
+  border-radius:var(--radius);
+  padding:28px;
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  box-shadow: var(--glass-glow);
+  color: #eaf5ff;
+}
+
+/* small brand row */
+.brand-row{ text-align:center; margin-bottom:12px; }
+.brand{ font-weight:800; color:var(--accent); margin:0; font-size:28px; letter-spacing:0.6px; text-shadow:0 6px 18px rgba(0,168,255,0.06) }
+.tag{ margin:0; margin-top:6px; color:var(--muted); font-size:13px; }
+
+/* form styles */
+.login-form .form-label{ display:block; font-size:13px; color:#c7dff6; margin-bottom:8px }
+.login-form input[type=text], .login-form input[type=password]{
+  width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background: rgba(4,7,15,0.45);
+  color: #f1f8ff; outline:none; font-size:14px;
+  transition:box-shadow .18s, border-color .12s, transform .12s;
+}
+.login-form input:focus{
+  box-shadow: 0 8px 30px rgba(0,168,255,0.08);
+  border-color: rgba(0,168,255,0.28);
+  transform: translateY(-1px);
+}
+
+/* checkbox + link row */
+.row.between{ display:flex; align-items:center; justify-content:space-between; margin:12px 0 18px; font-size:13px; color:var(--muted) }
+.checkbox input{ margin-right:8px }
+
+/* buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 16px; border-radius:10px; cursor:pointer; border:0; font-weight:600; text-decoration:none;
+  font-size:14px;
+}
+.btn.primary{
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color:#061021;
+  box-shadow: 0 6px 24px rgba(0,168,255,0.12), 0 0 18px rgba(255,180,64,0.04) inset;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.btn.primary:hover{
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 14px 40px rgba(0,168,255,0.16), 0 0 30px rgba(255,180,64,0.06) inset;
+}
+.btn.primary.glow{
+  box-shadow: 0 10px 36px rgba(0,168,255,0.14), 0 0 26px rgba(0,168,255,0.08);
+}
+
+/* subtle alert */
+.alert{
+  background: rgba(255,60,60,0.06);
+  border-left: 3px solid rgba(255,80,80,0.14);
+  color:#ffd6d6;
+  padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:13px;
+}
+
+/* footer / signup text */
+.signup{ margin-top:12px; font-size:13px; color:var(--muted) }
+.link{ color:var(--accent); text-decoration:none; font-weight:600; }
+.link:hover{ text-decoration:underline; text-shadow:0 6px 18px rgba(0,168,255,0.06) }
+
+/* ---- Navbar + Hero (main page) ---- */
+.navbar{
+  position:fixed; top:18px; left:18px; right:18px; display:flex; align-items:center; justify-content:space-between;
+  z-index:2; padding:10px 18px; border-radius:12px; gap:12px;
+  background: linear-gradient(180deg, rgba(3,6,12,0.12), rgba(3,6,12,0.06));
+  border:1px solid rgba(255,255,255,0.03);
+  backdrop-filter: blur(6px);
+}
+.nav-left .logo{ font-weight:800; color:var(--accent); font-size:18px }
+.nav-right{ display:flex; gap:14px; align-items:center }
+.nav-link{ color:#cfeeff; text-decoration:none; font-weight:600; font-size:14px; opacity:0.95 }
+.nav-icon{ color:var(--muted); font-size:13px }
+
+/* hero */
+.hero{
+  min-height:60vh; display:flex; align-items:center; justify-content:center; text-align:center; z-index:1; padding:110px 20px 60px;
+}
+.hero-inner{ max-width:920px; }
+.hero-title{ font-size:40px; margin:0; color: #fff; letter-spacing:-1px; text-shadow: 0 12px 40px rgba(0,0,0,0.5) }
+.hero-sub{ margin-top:12px; color:var(--muted); font-size:16px }
+
+/* CTA */
+.hero-cta .btn{ margin-top:18px }
+
+/* ---- Forms and cards on main page ---- */
+.container{
+  max-width:var(--max-width);
+  margin:0 auto;
+  padding:26px;
+  z-index:1;
+  position:relative;
+}
+.card{ background: linear-gradient(180deg, rgba(6,8,12,0.45), rgba(6,8,12,0.3)); border-radius:12px; padding:18px; color:#e9f5ff; border:1px solid rgba(255,255,255,0.03); }
+.form-card{ width:100%; margin-bottom:18px }
+.small-card{ margin-top:18px }
+
+/* grid helpers */
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+.field{ margin-bottom:12px }
+.field label{ display:block; color:var(--muted); font-size:13px; margin-bottom:8px }
+.field input, .field select{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background: rgba(3,6,12,0.45); color:#eaf6ff }
+
+/* tasks list */
+.tasks{ list-style:none; padding:0; margin:0; color:var(--muted) }
+.tasks li{ padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.02) }
+.muted{ color:rgba(255,255,255,0.28) }
+
+/* footer */
+.footer{ text-align:center; color:var(--muted); margin:24px 0 60px; }
+
+/* ---- Responsive adjustments ---- */
+@media (max-width:900px){ .hero-title{ font-size:32px } .navbar{ left:12px; right:12px } .grid-2{ grid-template-columns:1fr } .login-card{ max-width:92% } .container{ padding:16px } }
+@media (max-width:420px){ .brand{font-size:22px} .hero-title{ font-size:24px } .login-form input{ padding:10px } .btn{ padding:10px 12px } }
+
+/* small helper for hiding video fallback visuals if JS sets a backdrop image */
+.bg-poster-fallback{
+  position:fixed; inset:0; background-size:cover; background-position:center; z-index:-2; filter: blur(0.5px) brightness(0.6);
+}
