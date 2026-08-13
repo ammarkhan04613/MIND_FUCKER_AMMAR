@@ -4,10 +4,12 @@ from threading import Thread, Event
 import time
 import random
 import string
+import os
 from functools import wraps
+
 app = Flask(__name__)
-app.debug = True
-app.secret_key = 'your_secret_key_here'  # Change this to a strong secret key
+app.debug = False  # CRITICAL: Must be False for production
+app.secret_key = os.environ.get('SECRET_KEY', 'your_secret_key_here')  # Use env variable
 
 # Simple user database (in production, use a proper database)
 users = {
@@ -779,4 +781,6 @@ def stop_task():
         return f'No task found with ID {task_id}.'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    # Get port from Render environment variable, default to 5000
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
