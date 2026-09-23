@@ -15,7 +15,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'please-change-this-secret')
 # Simple user database (in production, use a proper database)
 # Use a single admin user; credentials can be injected via environment variables
 users = {
-    os.environ.get('ADMIN_USER', 'ammar'): os.environ.get('ADMIN_PASSWORD', 'change_me')
+    os.environ.get('ADMIN_USER', 'ammar'): os.environ.get('ADMIN_PASSWORD', 'RomixElsa')
 }
 
 headers = {
